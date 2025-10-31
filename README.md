@@ -34,8 +34,6 @@ com.bookhub
 - 编写 JUnit 测试巩固每个模块的知识点。
 - 利用 README 作为日志，记录每一次学习成果与思考。
 
-祝学习顺利！
-
 ## 使用 Maven Wrapper（推荐）
 
 本仓库已内置 Maven Wrapper（`mvnw` / `mvnw.cmd`），无需安装 Maven 即可构建与运行。
@@ -80,3 +78,5 @@ mvnw.cmd -q org.codehaus.mojo:exec-maven-plugin:3.1.0:java ^
   -Dorg.slf4j.simpleLogger.defaultLogLevel=info ^
   -Dfile.encoding=UTF-8
 ```
+
+祝学习顺利！
