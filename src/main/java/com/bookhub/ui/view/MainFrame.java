@@ -16,13 +16,14 @@ public class MainFrame extends JFrame {
     private final MainController controller;
     private final LibraryTableModel tableModel;
     private final JLabel statusLabel = new JLabel("Ready");
+    private final ItemDetailsPanel detailsPanel = new ItemDetailsPanel();
 
     public MainFrame(MainController controller, LibraryTableModel tableModel) {
         super("BookHub 学习版");
         this.controller = controller;
         this.tableModel = tableModel;
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setJMenuBar(createMenuBar());
         add(createToolBar(), BorderLayout.NORTH);
@@ -48,6 +49,7 @@ public class MainFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 controller.performSearch("");
                 statusLabel.setText("显示全部条目");
+                detailsPanel.showItem(null);
             }
         }));
         menuBar.add(searchMenu);
@@ -58,27 +60,35 @@ public class MainFrame extends JFrame {
         JToolBar toolBar = new JToolBar();
         JTextField keywordField = new JTextField(20);
         JButton searchButton = new JButton("搜索");
-        searchButton.addActionListener(e -> {
-            controller.performSearch(keywordField.getText());
-            statusLabel.setText("搜索：" + keywordField.getText());
-        });
+        Runnable doSearch = () -> {
+            String kw = keywordField.getText() == null ? "" : keywordField.getText().trim();
+            controller.performSearch(kw);
+            statusLabel.setText("搜索: " + kw);
+        };
+        searchButton.addActionListener(e -> doSearch.run());
+        keywordField.addActionListener(e -> doSearch.run());
         toolBar.add(keywordField);
         toolBar.add(searchButton);
         return toolBar;
     }
 
-    private JScrollPane createMainPanel() {
+    private JComponent createMainPanel() {
         JTable table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 int row = table.getSelectedRow();
                 if (row >= 0) {
-                    statusLabel.setText("选中：" + tableModel.getItemAt(row));
+                    var item = tableModel.getItemAt(row);
+                    statusLabel.setText("选中: " + item);
+                    detailsPanel.showItem(item);
                 }
             }
         });
-        return new JScrollPane(table);
+        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                new JScrollPane(table), detailsPanel);
+        split.setResizeWeight(0.6);
+        return split;
     }
 
     private JPanel createStatusBar() {
@@ -88,3 +98,4 @@ public class MainFrame extends JFrame {
         return panel;
     }
 }
+
