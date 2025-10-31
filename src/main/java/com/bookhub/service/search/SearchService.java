@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -32,7 +33,9 @@ public class SearchService {
     }
 
     public List<MediaItem> search(String keyword) {
-        Predicate<MediaItem> filter = media -> media.searchableText().toLowerCase().contains(keyword.toLowerCase());
+        String safeKeyword = Objects.requireNonNullElse(keyword, "");
+        String needle = safeKeyword.toLowerCase(Locale.ROOT);
+        Predicate<MediaItem> filter = media -> media.searchableText().toLowerCase(Locale.ROOT).contains(needle);
         return Collections.unmodifiableList(strategy.search(items, filter));
     }
 

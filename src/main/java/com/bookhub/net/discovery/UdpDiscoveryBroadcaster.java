@@ -25,6 +25,7 @@ public class UdpDiscoveryBroadcaster implements AutoCloseable, Runnable {
         this.port = port;
         try {
             this.socket = new DatagramSocket();
+            this.socket.setBroadcast(true);
         } catch (IOException e) {
             throw new NetworkException("无法创建 UDP 套接字", e);
         }
@@ -37,11 +38,15 @@ public class UdpDiscoveryBroadcaster implements AutoCloseable, Runnable {
         while (running) {
             try {
                 byte[] data = message.getBytes(StandardCharsets.UTF_8);
-                DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), port);
+                DatagramPacket packet = new DatagramPacket(
+                        data, data.length, InetAddress.getByName("255.255.255.255"), port);
                 socket.send(packet);
                 Thread.sleep(1000);
-            } catch (IOException | InterruptedException e) {
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                logger.error("广播失败（线程中断）", e);
+                break;
+            } catch (IOException e) {
                 logger.error("广播失败", e);
                 break;
             }
@@ -54,3 +59,4 @@ public class UdpDiscoveryBroadcaster implements AutoCloseable, Runnable {
         socket.close();
     }
 }
+

@@ -1,8 +1,8 @@
 package com.bookhub.net.http;
 
+import com.bookhub.util.exception.NetworkException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.bookhub.util.exception.NetworkException;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -29,10 +29,17 @@ public class MetadataClient {
             HttpRequest request = HttpRequest.newBuilder(URI.create(endpoint)).GET().build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             logger.info("HTTP {} -> {}", endpoint, response.statusCode());
+            int status = response.statusCode();
+            if (status < 200 || status >= 300) {
+                throw new NetworkException("获取远程元数据失败，HTTP 状态码: " + status, null);
+            }
             return objectMapper.readTree(response.body());
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new NetworkException("获取远程元数据失败（线程中断）", e);
+        } catch (IOException e) {
             throw new NetworkException("获取远程元数据失败", e);
         }
     }
 }
+
