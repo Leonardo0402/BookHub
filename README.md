@@ -35,3 +35,48 @@ com.bookhub
 - 利用 README 作为日志，记录每一次学习成果与思考。
 
 祝学习顺利！
+
+## 使用 Maven Wrapper（推荐）
+
+本仓库已内置 Maven Wrapper（`mvnw` / `mvnw.cmd`），无需安装 Maven 即可构建与运行。
+
+- Windows:
+  - 运行测试：`mvnw.cmd -q -DskipTests=false test`
+  - 启动应用（推荐）：`mvnw.cmd -q org.codehaus.mojo:exec-maven-plugin:3.1.0:java -Dexec.mainClass=com.bookhub.app.BookHubApplication`
+- macOS/Linux:
+  - 运行测试：`./mvnw -q -DskipTests=false test`
+  - 启动应用（推荐）：`./mvnw -q org.codehaus.mojo:exec-maven-plugin:3.1.0:java -Dexec.mainClass=com.bookhub.app.BookHubApplication`
+
+说明：使用 `exec-maven-plugin` 启动会自动把依赖加入类路径，避免 `java -jar` 方式遗漏依赖的问题。
+
+## 常用 Maven 命令示例
+
+- 清理与编译：`mvnw[.cmd] -q clean compile`
+- 运行全部测试：`mvnw[.cmd] -q test`
+- 仅运行单个测试类：`mvnw[.cmd] -q -Dtest=SearchServiceTest test`
+- 仅运行某个测试方法：`mvnw[.cmd] -q -Dtest=SearchServiceTest#searchByKeywordFindsMatchingItems test`
+- 打包 JAR：`mvnw[.cmd] -q -DskipTests package`
+- 使用 exec 插件运行主类：
+  - `mvnw[.cmd] -q org.codehaus.mojo:exec-maven-plugin:3.1.0:java -Dexec.mainClass=com.bookhub.app.BookHubApplication`
+
+可选：如需通过 `java -jar` 运行，请先打包，然后确保依赖在类路径（或改用 Shade/Assembly 打包可执行 JAR）。推荐仍使用上面的 exec 方式。
+
+## 运行与配置
+
+- 启动 UI：执行“使用 Maven Wrapper”中的启动命令后会弹出 Swing 主窗口。
+- 日志等级（slf4j-simple）：在命令行追加 JVM 选项控制日志，例如：
+  - `-Dorg.slf4j.simpleLogger.defaultLogLevel=info`
+  - `-Dorg.slf4j.simpleLogger.showThreadName=true`
+  - `-Dorg.slf4j.simpleLogger.showDateTime=true`
+- 编码设置：Windows 终端如出现中文乱码，可：
+  - 切换终端到 UTF-8：`chcp 65001`
+  - 或在命令中追加：`-Dfile.encoding=UTF-8`
+
+示例（Windows，UTF-8 日志、信息级别）：
+
+```
+mvnw.cmd -q org.codehaus.mojo:exec-maven-plugin:3.1.0:java ^
+  -Dexec.mainClass=com.bookhub.app.BookHubApplication ^
+  -Dorg.slf4j.simpleLogger.defaultLogLevel=info ^
+  -Dfile.encoding=UTF-8
+```
